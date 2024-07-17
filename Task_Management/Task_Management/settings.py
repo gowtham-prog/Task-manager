@@ -104,6 +104,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Task_Management.wsgi.application'
 
 
+# celery 
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_TIMEZONE = 'UTC'
+# CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -114,6 +120,7 @@ DATABASES = {
     }
 }
 AUTH_USER_MODEL = 'apis.User'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

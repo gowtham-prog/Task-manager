@@ -3,6 +3,7 @@ import django.core.asgi
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from .tasks import send_acknowledgement_email
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
@@ -107,7 +108,11 @@ class LogoutView(APIView):
 class TaskCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated, ]
     serializer_class = TaskSerializer
-    queryset = Task.objects.all()
+
+    def perform_create(self, serializer):
+        task = serializer.save()
+        # Call the Celery task asynchronously
+        send_acknowledgement_email.delay()
 
 class TaskListAPIView(ListAPIView):
     permission_classes = [ IsAuthenticated, ]
