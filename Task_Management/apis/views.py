@@ -3,7 +3,8 @@ import django.core.asgi
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from .tasks import send_acknowledgement_email
+
+from .tasks import send_acknowledgement_email, add
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
@@ -12,17 +13,18 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from rest_framework.pagination import LimitOffsetPagination
+# from rest_framework.pagination import LimitOffsetPagination
 
 from .models import User,Task
 from .serializers import UserSerializer,TaskSerializer
 
 
+
 # Create your views here.
 
-class CustomLimitOffsetPagination(LimitOffsetPagination):
-    default_limit = 20
-    max_limit = 100
+# class CustomLimitOffsetPagination(LimitOffsetPagination):
+#     default_limit = 20
+#     max_limit = 100
 
 
 class UserCreateAPIView(CreateAPIView):
@@ -112,7 +114,11 @@ class TaskCreateAPIView(CreateAPIView):
     def perform_create(self, serializer):
         task = serializer.save()
         # Call the Celery task asynchronously
-        send_acknowledgement_email.delay()
+        # celery_task = send_acknowledgement_email.delay(task)
+        ad = add.delay(10,1024)
+        print(ad.get())
+        # result = celery_task.get()
+        # print(result)
 
 class TaskListAPIView(ListAPIView):
     permission_classes = [ IsAuthenticated, ]
